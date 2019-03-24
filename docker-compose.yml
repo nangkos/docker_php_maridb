@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      - "PMA_HOST=db"
+      - "PMA_USER=root"
+      - "PMA_PASSWORD=secret"
+  web:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: apach2_php7
+    volumes:
+      - "./www:/var/www/html"
+      - "./php/php.ini:/usr/local/etc/php/conf.d/php.ini"
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    volumes:
+      - "./data:/var/lib/mysql:rw"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=secret"  #passowrd: secret
+      - "MYSQL_USER=nangko"
+      - "MYSQL_PASSWORD=nangko@2019"  #password: nangko@2019
+    ports:
+      - "3306:3306"
+    command:
+      "mysqld --innodb-flush-method=fsync"
